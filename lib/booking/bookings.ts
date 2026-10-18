@@ -215,8 +215,8 @@ export type BookResult = { ok: true; id: number } | { ok: false; reason: 'taken'
  * and answer 'taken'. With "any stylist" we try again (up to 3 times):
  * open_slots now sees the first booking, so another free stylist is chosen.
  *
- * A client account must have a VERIFIED email (checked in the same WHERE,
- * as a backstop to the action's own check).
+ * A client booking for themselves must have a VERIFIED email (checked in
+ * the same WHERE, as a backstop to the action's own check).
  */
 export async function createBooking(input: NewBooking): Promise<BookResult> {
   const attempts = input.stylistId === null ? 3 : 1
@@ -246,7 +246,10 @@ async function insertBooking(input: NewBooking): Promise<number | null> {
       FROM open_slots(${input.serviceId}::int, ${input.stylistId}::int, ${input.date}::date, NULL, ${input.staff}::boolean) o, day
       WHERE o.starts_at = ${input.startsAt}
         AND (${clientId}::uuid IS NULL
-             OR EXISTS (SELECT 1 FROM users u WHERE u.id = ${clientId}::uuid AND u.email_verified_at IS NOT NULL AND u.deactivated_at IS NULL))
+             OR EXISTS (SELECT 1 FROM users u WHERE u.id = ${clientId}::uuid AND u.deactivated_at IS NULL
+                          -- A client booking for themselves needs a confirmed email; the
+                          -- studio booking for them on the phone vouches for them.
+                          AND (u.email_verified_at IS NOT NULL OR ${input.staff}::boolean)))
       ORDER BY (SELECT COALESCE(sum(upper(b.during) - lower(b.during)), interval '0')
                 FROM bookings b
                 WHERE b.stylist_id = o.stylist_id AND b.status = 'confirmed' AND b.during && day.range),

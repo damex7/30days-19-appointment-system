@@ -40,14 +40,17 @@ async function Today({ searchParams }: Pick<PageProps<'/stylist'>, 'searchParams
   const start = startOfLocalDay(today, tz)
   const end = startOfLocalDay(addDays(today, 1), tz)
   const [bookings, timeOff] = await Promise.all([listBookingsBetween(viewer, start, end), listTimeOffBetween(start, end, stylist.id)])
-  const { notice } = await searchParams
+  const { notice, denied } = await searchParams
   const now = currentTime().getTime()
   const active = bookings.filter((b) => b.status !== 'cancelled')
   const next = active.find((b) => b.status === 'confirmed' && b.startsAt.getTime() > now)
 
   return (
     <div className="space-y-6">
-      <Flash message={notice === 'password-set' ? 'Your password is set. Welcome to Ìpàdé.' : null} />
+      <Flash
+        message={notice === 'password-set' ? 'Your password is set. Welcome to Ìpàdé.' : denied ? 'That page isn’t part of a stylist account, so you’ve been brought here.' : null}
+        tone={denied ? 'info' : 'success'}
+      />
       <PageHeader
         title={`Today, ${stylist.displayName}`}
         description={`${formatDayLong(today)} · ${active.length} ${active.length === 1 ? 'appointment' : 'appointments'} · studio time, ${settings.zoneLabel}`}

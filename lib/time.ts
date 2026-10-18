@@ -210,9 +210,9 @@ export function formatDayLong(date: LocalDate): string {
   return formatLocalDate(date, { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
-/** "Tuesday 21 October 2026" */
+/** "Tuesday 21 October 2026" (built from the same parts as formatDayLong, so the two read alike). */
 export function formatDayWithYear(date: LocalDate): string {
-  return formatLocalDate(date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  return `${formatDayLong(date)} ${date.slice(0, 4)}`
 }
 
 /** "Tue 21 Oct" */

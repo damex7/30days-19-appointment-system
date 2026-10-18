@@ -40,6 +40,7 @@ const NOTICES: Record<string, string> = {
   booked: 'You’re booked! A confirmation with a calendar file is on its way to your inbox.',
   rescheduled: 'Moved. We’ve emailed you the new time and an updated calendar file.',
   cancelled: 'Cancelled. The time is free for someone else now.',
+  'booked-for': 'Booked. If the client has an account, they’ve been emailed the details and a calendar file.',
 }
 
 export default function AppointmentPage({ params, searchParams }: PageProps<'/appointments/[id]'>) {

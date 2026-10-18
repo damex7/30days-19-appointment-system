@@ -37,11 +37,11 @@ export async function openTimes(serviceId: number, stylistId: number | null, dat
  * a row per day, and CROSS JOIN LATERAL runs open_slots for each one.
  * Days with no open time don't come back at all, so the caller fills in 0.
  */
-export async function openDays(serviceId: number, stylistId: number | null, from: LocalDate, to: LocalDate, options: { ignoreBookingId?: number } = {}): Promise<Map<LocalDate, number>> {
+export async function openDays(serviceId: number, stylistId: number | null, from: LocalDate, to: LocalDate, options: { ignoreBookingId?: number; staff?: boolean } = {}): Promise<Map<LocalDate, number>> {
   const rows = await sql`
     SELECT to_char(d, 'YYYY-MM-DD') AS day, count(DISTINCT o.starts_at)::int AS count
     FROM generate_series(${from}::date, ${to}::date, interval '1 day') AS d
-    CROSS JOIN LATERAL open_slots(${serviceId}::int, ${stylistId}::int, d::date, ${options.ignoreBookingId ?? null}::int, false) AS o
+    CROSS JOIN LATERAL open_slots(${serviceId}::int, ${stylistId}::int, d::date, ${options.ignoreBookingId ?? null}::int, ${options.staff ?? false}::boolean) AS o
     GROUP BY d
     ORDER BY d`
   const parsed = parseRows(z.object({ day: z.string(), count: z.number().int() }), rows, 'openDays')

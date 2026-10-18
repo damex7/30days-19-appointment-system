@@ -6,6 +6,7 @@ import { PageSkeleton } from '@/components/site/page-skeleton'
 import { SignOutButton } from '@/components/site/sign-out-button'
 import { button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
+import { Notice } from '@/components/ui/notice'
 import { verifySession } from '@/lib/auth/dal'
 import { getSettings } from '@/lib/settings'
 import { formatDateOnly } from '@/lib/time'
@@ -14,10 +15,10 @@ export const metadata: Metadata = { title: 'Your account' }
 
 const ROLE_LABELS = { client: 'Client', stylist: 'Stylist', admin: 'Admin' } as const
 
-export default function AccountPage() {
+export default function AccountPage({ searchParams }: PageProps<'/account'>) {
   return (
     <Suspense fallback={<PageSkeleton />}>
-      <Account />
+      <Account searchParams={searchParams} />
     </Suspense>
   )
 }
@@ -26,12 +27,17 @@ export default function AccountPage() {
   No "delete account" (Day 17 had one): every booking keeps its client, so
   accounts are deactivated by an admin, never deleted.
 */
-async function Account() {
+async function Account({ searchParams }: Pick<PageProps<'/account'>, 'searchParams'>) {
   const { user } = await verifySession()
-  const { timeZone } = await getSettings()
+  const [{ timeZone }, { denied }] = await Promise.all([getSettings(), searchParams])
 
   return (
     <div className="space-y-6">
+      {denied === 'verify' && !user.emailVerifiedAt ? (
+        <Notice tone="warning" title="Please confirm your email address first">
+          <p>The admin pages open once your email address is confirmed. Use the link we sent you, or ask for a new one above.</p>
+        </Notice>
+      ) : null}
       <div>
         <h1 className="text-4xl">Your account</h1>
         <p className="mt-2 text-muted">

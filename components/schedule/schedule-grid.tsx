@@ -48,7 +48,9 @@ const KIND: Record<GridBlock['kind'], { word: string; icon: IconName; className:
   time_off: { word: 'Time off', icon: 'door', className: 'hatched border-unavailable text-ink' },
 }
 
-const PX_PER_MIN = 1.1
+const PX_PER_MIN = 1.3
+/** Below this height a block shows one compact line instead of four. */
+const COMPACT_PX = 58
 
 export function ScheduleGrid({ columns, startHour, endHour, label }: { columns: GridColumn[]; startHour: number; endHour: number; label: string }) {
   const first = startHour * 60
@@ -98,7 +100,15 @@ export function ScheduleGrid({ columns, startHour, endHour, label }: { columns: 
                 const style = KIND[block.kind]
                 const top = y(block.start)
                 const blockHeight = Math.max(y(block.end) - top, 26)
-                const body = (
+                const compact = blockHeight < COMPACT_PX
+                const body = compact ? (
+                  <span className="flex items-center gap-1 text-xs">
+                    <Icon name={style.icon} className="size-3 shrink-0" />
+                    <span className="sr-only">{style.word}: </span>
+                    <span className="when figures shrink-0">{formatClock(timeFromMinutes(block.start))}</span>
+                    <span className="truncate font-semibold">{block.title}</span>
+                  </span>
+                ) : (
                   <>
                     <span className="flex items-center gap-1 text-[0.7rem] font-semibold tracking-wide uppercase">
                       <Icon name={style.icon} className="size-3" />

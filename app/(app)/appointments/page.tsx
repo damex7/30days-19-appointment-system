@@ -8,6 +8,7 @@ import { BookingCard } from '@/components/booking/booking-card'
 import { PageSkeleton } from '@/components/site/page-skeleton'
 import { button } from '@/components/ui/button'
 import { EmptyState } from '@/components/ui/empty-state'
+import { Flash } from '@/components/ui/flash'
 import { Icon } from '@/components/ui/icon'
 import { PageHeader } from '@/components/ui/page-header'
 import { requireRole } from '@/lib/auth/dal'
@@ -16,20 +17,30 @@ import { getSettings } from '@/lib/settings'
 
 export const metadata: Metadata = { title: 'My appointments' }
 
-export default function AppointmentsPage() {
+export default function AppointmentsPage({ searchParams }: PageProps<'/appointments'>) {
   return (
     <Suspense fallback={<PageSkeleton />}>
-      <Appointments />
+      <Appointments searchParams={searchParams} />
     </Suspense>
   )
 }
 
-async function Appointments() {
+const NOTICES: Record<string, string> = {
+  verified: 'Thank you, your email address is confirmed. You can book now.',
+  'password-reset': 'Your password was changed and you’re signed in.',
+  'password-set': 'Your password is set.',
+}
+
+async function Appointments({ searchParams }: Pick<PageProps<'/appointments'>, 'searchParams'>) {
   const { user } = await requireRole('client')
-  const [{ upcoming, past }, settings] = await Promise.all([listClientBookings(user.id), getSettings()])
+  const [{ upcoming, past }, settings, { notice, denied }] = await Promise.all([listClientBookings(user.id), getSettings(), searchParams])
 
   return (
     <div className="space-y-8">
+      <Flash
+        message={denied ? 'That page is for studio staff, so you’ve been brought to your appointments.' : typeof notice === 'string' ? (NOTICES[notice] ?? null) : null}
+        tone={denied ? 'info' : 'success'}
+      />
       <PageHeader
         title="My appointments"
         description={`Times are studio time in Lagos, ${settings.zoneLabel}. You can reschedule or cancel up to ${settings.cancellationCutoffHours} hours before.`}
