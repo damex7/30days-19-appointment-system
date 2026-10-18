@@ -7,7 +7,8 @@ import { Icon } from '@/components/ui/icon'
 import { Notice } from '@/components/ui/notice'
 import { verifySession } from '@/lib/auth/dal'
 import { listSessions } from '@/lib/auth/session'
-import { fromNow, longDate } from '@/lib/format'
+import { getSettings } from '@/lib/settings'
+import { formatStamp, fromNow } from '@/lib/time'
 import { describeUserAgent } from '@/lib/user-agent'
 
 export const metadata: Metadata = { title: 'Your sessions' }
@@ -39,6 +40,7 @@ const isPhone = (userAgent: string | null) => /Android|iPhone|iPod|Mobile/.test(
  */
 async function Sessions({ searchParams }: Pick<PageProps<'/account/sessions'>, 'searchParams'>) {
   const { user, session: current } = await verifySession()
+  const { timeZone } = await getSettings()
   const [sessions, params] = await Promise.all([listSessions(user.id), searchParams])
   const notice = noticeText(params.notice, params.count)
   const others = sessions.filter((s) => s.id !== current.id).length
@@ -90,7 +92,7 @@ async function Sessions({ searchParams }: Pick<PageProps<'/account/sessions'>, '
                 <div>
                   <dt className="text-sm font-semibold text-muted">Last active</dt>
                   <dd>
-                    <time dateTime={session.lastSeenAt.toISOString()} title={longDate(session.lastSeenAt)}>
+                    <time dateTime={session.lastSeenAt.toISOString()} title={formatStamp(session.lastSeenAt, timeZone)}>
                       {isCurrent ? 'Now' : fromNow(session.lastSeenAt)}
                     </time>
                   </dd>
@@ -98,13 +100,13 @@ async function Sessions({ searchParams }: Pick<PageProps<'/account/sessions'>, '
                 <div>
                   <dt className="text-sm font-semibold text-muted">Signed in</dt>
                   <dd>
-                    <time dateTime={session.createdAt.toISOString()}>{longDate(session.createdAt)}</time>
+                    <time dateTime={session.createdAt.toISOString()}>{formatStamp(session.createdAt, timeZone)}</time>
                   </dd>
                 </div>
                 <div>
                   <dt className="text-sm font-semibold text-muted">Expires</dt>
                   <dd>
-                    <time dateTime={session.expiresAt.toISOString()} title={longDate(session.expiresAt)}>
+                    <time dateTime={session.expiresAt.toISOString()} title={formatStamp(session.expiresAt, timeZone)}>
                       {fromNow(session.expiresAt)}
                     </time>
                   </dd>

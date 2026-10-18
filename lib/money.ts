@@ -1,10 +1,11 @@
 // MONEY: integer kobo everywhere, Naira only on screen.
 //
-// ₦1 = 100 kobo. The database stores bigint kobo (db/migrations/008), the
+// ₦1 = 100 kobo. The database stores bigint kobo (services.price_kobo and
+// bookings.price_kobo), the
 // code passes whole numbers of kobo around, and only these two functions
 // turn them into or out of Naira text. No floats are ever used for money:
-// in binary floating point 0.1 + 0.2 = 0.30000000000000004, and a stock
-// value adds up thousands of prices.
+// in binary floating point 0.1 + 0.2 = 0.30000000000000004, and a day's
+// takings add up many prices.
 //
 // Why `number` and not `bigint` in TypeScript? A JavaScript number holds
 // every whole number exactly up to 2^53 (9,007,199,254,740,991 kobo, about
@@ -59,12 +60,3 @@ export function parseNaira(input: string): number | null {
   return Number(kobo)
 }
 
-/**
- * quantity × unit price, in kobo, guarded against overflow. Used for the
- * value of a row (12 tins × ₦950).
- */
-export function lineValue(quantity: number, kobo: number): number {
-  const value = quantity * kobo
-  if (!Number.isSafeInteger(value)) throw new Error('Amount too large to calculate exactly')
-  return value
-}

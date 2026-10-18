@@ -4,9 +4,9 @@
 // layer turns the ones we expect into friendly messages; anything else is
 // re-thrown and reaches an error boundary.
 //
-// Letting the database decide, then explaining, is deliberate. "Check first,
-// then delete" has a gap: a movement could be recorded between the check
-// and the delete. The foreign key can't be raced.
+// Letting the database decide, then explaining, is deliberate. "Check
+// first, then write" has a gap: another request can slip in between the
+// check and the write. A constraint can't be raced.
 import 'server-only'
 
 type PgError = { code?: string; constraint?: string }
@@ -30,14 +30,26 @@ export function isReferencedError(error: unknown): boolean {
   return code === '23503' || code === '23001'
 }
 
-/** 23505: a UNIQUE constraint refused a duplicate (a SKU or name that exists, in any case). */
+/** 23505: a UNIQUE constraint refused a duplicate (a slug or a closure date that exists). */
 export function isUniqueError(error: unknown, constraint?: string): boolean {
   const e = pgError(error)
   return e?.code === '23505' && (!constraint || e.constraint === constraint)
 }
 
-/** 23514: a CHECK constraint refused a value, e.g. stock_levels_quantity_check (stock below zero). */
+/** 23514: a CHECK constraint refused a value (or the time-zone trigger in 007 did). */
 export function isCheckError(error: unknown, constraint?: string): boolean {
   const e = pgError(error)
   return e?.code === '23514' && (!constraint || e.constraint === constraint)
+}
+
+/**
+ * 23P01 exclusion_violation: an EXCLUDE constraint refused a row because
+ * it overlaps another one. The one that matters most today:
+ * bookings_no_overlap, which is how two clients racing for the same slot
+ * end up with exactly one booking (the second insert fails with this).
+ * Also working_hours_no_overlap and time_off_no_overlap.
+ */
+export function isExclusionError(error: unknown, constraint?: string): boolean {
+  const e = pgError(error)
+  return e?.code === '23P01' && (!constraint || e.constraint === constraint)
 }

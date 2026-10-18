@@ -11,7 +11,8 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Pagination } from '@/components/ui/table-parts'
 import { requireRole } from '@/lib/auth/dal'
 import { cn } from '@/lib/cn'
-import { fromNow, shortDate } from '@/lib/format'
+import { getSettings } from '@/lib/settings'
+import { formatDateOnly, fromNow } from '@/lib/time'
 import { hrefWith } from '@/lib/url'
 import { ADMIN_PAGE_SIZE, listUsers } from '@/lib/users'
 import { adminSearchSchema } from '@/lib/validation'
@@ -30,6 +31,7 @@ async function Users({ searchParams }: Pick<PageProps<'/admin/users'>, 'searchPa
   // requireRole redirects clients and stylists (and an admin with an unconfirmed email)
   // before any user data is read.
   const { user: admin } = await requireRole('admin')
+  const { timeZone } = await getSettings()
   const { q, page } = adminSearchSchema.parse(await searchParams)
   const { users, total } = await listUsers({ q, page })
 
@@ -87,7 +89,7 @@ async function Users({ searchParams }: Pick<PageProps<'/admin/users'>, 'searchPa
                   <p className="mt-0.5 text-sm break-all">{user.email}</p>
                   <p className="mt-1 text-sm text-muted">
                     <span className={user.emailVerifiedAt ? 'text-success' : 'text-warning'}>{user.emailVerifiedAt ? '✓ Email confirmed' : '! Email not confirmed'}</span>
-                    {user.mustChangePassword ? ' · still on the temporary password' : ''} · last sign-in {user.lastLoginAt ? fromNow(user.lastLoginAt) : 'never'} · since {shortDate(user.createdAt)}
+                    {user.mustChangePassword ? ' · still on the temporary password' : ''} · last sign-in {user.lastLoginAt ? fromNow(user.lastLoginAt) : 'never'} · since {formatDateOnly(user.createdAt, timeZone)}
                   </p>
                   {isSelf ? null : (
                     <div className="mt-3 flex flex-wrap gap-2">

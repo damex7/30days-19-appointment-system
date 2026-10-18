@@ -7,9 +7,12 @@ import { SignOutButton } from '@/components/site/sign-out-button'
 import { button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import { verifySession } from '@/lib/auth/dal'
-import { shortDate } from '@/lib/format'
+import { getSettings } from '@/lib/settings'
+import { formatDateOnly } from '@/lib/time'
 
 export const metadata: Metadata = { title: 'Your account' }
+
+const ROLE_LABELS = { client: 'Client', stylist: 'Stylist', admin: 'Admin' } as const
 
 export default function AccountPage() {
   return (
@@ -20,18 +23,19 @@ export default function AccountPage() {
 }
 
 /*
-  Day 18 leaves out Day 17's "delete account": every stock movement records
-  who made it, so accounts are deactivated by an admin, never deleted.
+  No "delete account" (Day 17 had one): every booking keeps its client, so
+  accounts are deactivated by an admin, never deleted.
 */
 async function Account() {
   const { user } = await verifySession()
+  const { timeZone } = await getSettings()
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-4xl">Your account</h1>
         <p className="mt-2 text-muted">
-          {user.role === 'admin' ? 'Admin' : 'Staff'} · since {shortDate(user.createdAt)}
+          {ROLE_LABELS[user.role]} · since {formatDateOnly(user.createdAt, timeZone)}
         </p>
       </div>
 
