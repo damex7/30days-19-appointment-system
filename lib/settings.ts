@@ -15,6 +15,7 @@ import { cacheLife, cacheTag } from 'next/cache'
 import { z } from 'zod'
 import { sql } from '@/lib/db'
 import { parseRows } from '@/lib/rows'
+import { zoneLabel } from '@/lib/time'
 
 export const SETTINGS_TAG = 'settings'
 
@@ -28,7 +29,10 @@ const SettingsSchema = z.object({
   whatsappNumber: z.string(),
   address: z.string(),
 })
-export type StudioSettings = z.infer<typeof SettingsSchema>
+export type StudioSettings = z.infer<typeof SettingsSchema> & {
+  /** "WAT (UTC+1)": the zone's name and current offset, shown next to times. */
+  zoneLabel: string
+}
 
 export async function getSettings(): Promise<StudioSettings> {
   'use cache'
@@ -44,11 +48,15 @@ export async function getSettings(): Promise<StudioSettings> {
   // Migration 007 inserts the row, so this only happens on a database that
   // hasn't been migrated.
   if (!settings) throw new Error('The settings row is missing. Run `npm run db:migrate`.')
-  return settings
+  // Worked out here, inside the cache, because it depends on the current
+  // date (an offset belongs to a moment, not to a zone): the cached value
+  // is refreshed at least hourly, so a daylight-saving change elsewhere
+  // would show within the hour.
+  return { ...settings, zoneLabel: zoneLabel(settings.timeZone) }
 }
 
 /** Saves the settings (admin only: the action checks). The trigger in 007 refuses an unknown time zone. */
-export async function updateSettings(input: StudioSettings): Promise<void> {
+export async function updateSettings(input: Omit<StudioSettings, 'zoneLabel'>): Promise<void> {
   await sql`
     UPDATE settings SET
       studio_name = ${input.studioName}, time_zone = ${input.timeZone},

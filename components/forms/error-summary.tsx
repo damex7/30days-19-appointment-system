@@ -1,7 +1,7 @@
 // CLIENT COMPONENT: it moves keyboard focus, which only exists in the browser.
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { Icon } from '@/components/ui/icon'
 import type { FormState } from '@/lib/validation'
 
@@ -14,9 +14,10 @@ import type { FormState } from '@/lib/validation'
  * users can follow the links straight to each field.
  *
  * `labels` maps field names to the label text, so the summary can say
- * "Email: Enter an email address like ada@example.com".
+ * "Email: Enter an email address like ada@example.com". `children` adds
+ * more help inside the box, so it's read out together with the message.
  */
-export function ErrorSummary({ state, labels }: { state: FormState; labels: Record<string, string> }) {
+export function ErrorSummary({ state, labels, children }: { state: FormState; labels: Record<string, string>; children?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null)
   const show = state.status === 'error'
 
@@ -33,7 +34,7 @@ export function ErrorSummary({ state, labels }: { state: FormState; labels: Reco
       ref={ref}
       tabIndex={-1}
       aria-labelledby="error-summary-title"
-      className="mb-6 rounded-control border-2 border-danger bg-danger-soft p-4 motion-safe:animate-toast"
+      className="mb-6 rounded-control border-2 border-danger bg-danger-soft p-4 motion-safe:animate-rise"
     >
       <h2 id="error-summary-title" className="flex items-center gap-2 font-sans text-base font-bold text-danger">
         <Icon name="errorCircle" />
@@ -50,6 +51,8 @@ export function ErrorSummary({ state, labels }: { state: FormState; labels: Reco
           ))}
         </ul>
       ) : null}
+      {/* Extra help, e.g. the next open times after "that time was just taken". */}
+      {children}
     </div>
   )
 }

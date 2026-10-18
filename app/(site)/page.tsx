@@ -18,7 +18,7 @@ import { CATEGORIES, CATEGORY_BLURBS, CATEGORY_LABELS } from '@/lib/studio/categ
 import { listStudioHours } from '@/lib/studio/hours'
 import { listMenu } from '@/lib/studio/services'
 import { listPublicStylists } from '@/lib/studio/stylists'
-import { formatClock, formatDuration, WEEKDAYS, zoneLabel } from '@/lib/time'
+import { formatClock, formatDuration, WEEKDAYS } from '@/lib/time'
 
 export const metadata: Metadata = { title: { absolute: 'Ìpàdé: hair & beauty appointments in Lekki' } }
 
@@ -140,7 +140,7 @@ export default async function HomePage() {
           <h2 id="visit-title" className="text-3xl">
             Opening hours
           </h2>
-          <p className="mt-1 text-sm text-muted">Lagos time, {zoneLabel(settings.timeZone)}. Individual stylists’ days vary.</p>
+          <p className="mt-1 text-sm text-muted">Lagos time, {settings.zoneLabel}. Individual stylists’ days vary.</p>
           <table className="figures mt-4 w-full text-left">
             <caption className="sr-only">Opening hours by day</caption>
             <tbody className="divide-y divide-line">

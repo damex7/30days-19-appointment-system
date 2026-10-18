@@ -30,7 +30,7 @@ export function Flash({ message, tone = 'success' }: { message: string | null; t
       {visible ? (
         <div
           className={cn(
-            'flex items-start gap-2.5 rounded-control border-l-4 p-3.5 motion-safe:animate-toast',
+            'flex items-start gap-2.5 rounded-control border-l-4 p-3.5 motion-safe:animate-rise',
             tone === 'success' ? 'border-success bg-success-soft' : 'border-line-strong bg-raised',
           )}
         >

@@ -105,7 +105,8 @@ export function escapeHtml(text: string): string {
  * Inline styles only: most email apps ignore <style> blocks.
  */
 export function layout(heading: string, paragraphs: string[], button?: { label: string; url: string }): string {
-  const body = paragraphs.map((p) => `<p style="margin:0 0 16px;line-height:1.55">${p}</p>`).join('')
+  // A block that is already a table (the booking details) isn't wrapped in <p>.
+  const body = paragraphs.map((p) => (p.startsWith('<table') ? p : `<p style="margin:0 0 16px;line-height:1.55">${p}</p>`)).join('')
   const cta = button
     ? `<p style="margin:24px 0"><a href="${escapeHtml(button.url)}" style="background:#5e1b3f;color:#fffcf7;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">${escapeHtml(button.label)}</a></p>
        <p style="margin:0 0 16px;font-size:13px;color:#5c5450">Or paste this link into your browser:<br><span style="word-break:break-all">${escapeHtml(button.url)}</span></p>`
