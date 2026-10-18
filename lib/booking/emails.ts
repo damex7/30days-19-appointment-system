@@ -36,7 +36,7 @@ export function bookingEmail(kind: Kind, booking: Booking, settings: StudioSetti
   // Walk-ins booked at the desk have no email address.
   if (!booking.clientEmail) return null
   const tz = settings.timeZone
-  const when = `${formatDateTime(booking.startsAt, tz)} (${zoneLabel(tz, booking.startsAt)})`
+  const when = `${formatDateTime(booking.startsAt, tz)}, ${zoneLabel(tz, booking.startsAt)}`
   const link = appUrl(`/appointments/${booking.id}`)
   const whatsapp = whatsappLink(settings.whatsappNumber, `Hello, it's ${booking.clientName} about booking #${booking.id}.`)
   const details: [string, string][] = [

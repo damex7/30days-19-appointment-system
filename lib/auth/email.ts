@@ -51,6 +51,8 @@ export async function sendEmail(email: Email): Promise<boolean> {
         `│ Subject: ${email.subject}`,
         '│',
         ...email.text.split('\n').map((line) => `│ ${line}`),
+        // Attachments (the .ics calendar file) are printed too, so they can be checked.
+        ...(email.attachments ?? []).flatMap((file) => ['│', `│ ── Attachment: ${file.filename} (${file.contentType})`, ...file.content.split(/\r?\n/).filter(Boolean).map((line) => `│ ${line}`)]),
         '└────────────────────────────────────────────────────────────',
         '',
       ].join('\n'),
