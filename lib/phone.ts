@@ -1,12 +1,12 @@
 // NIGERIAN MOBILE NUMBERS. People write the same number many ways:
 // "0803 123 4567", "08031234567", "+234 803 123 4567", "234-803-123-4567".
 // We accept all of them, but STORE one: E.164, "+2348031234567". One stored
-// form means the CHECK in db/migrations/007 can verify it, two suppliers with
+// form means the CHECKs in db/migrations/006 and 010 can verify it, two clients with
 // the same number are easy to spot, and wa.me links just work.
 //
 // Nigerian mobile numbers are 11 digits starting 070, 080, 081, 090 or 091
 // (0 + 10 digits); internationally, +234 replaces the leading 0.
-// Not server-only: the supplier form shows the same rules.
+// Not server-only: the sign-up and booking forms show the same rules.
 
 const NATIONAL = /^0([789][01]\d{8})$/
 const INTERNATIONAL = /^(?:\+?234)([789][01]\d{8})$/
@@ -27,4 +27,14 @@ export function formatPhone(e164: string): string {
 /** "+2348031234567" → "2348031234567", the form wa.me links need. */
 export function whatsappNumber(e164: string): string {
   return e164.replace(/^\+/, '')
+}
+
+/**
+ * A "Chat on WhatsApp" link: https://wa.me/<number>?text=<message>. The
+ * message is pre-filled in the chat box; the person still presses Send, so
+ * nothing is sent on their behalf.
+ */
+export function whatsappLink(e164: string, message?: string): string {
+  const base = `https://wa.me/${whatsappNumber(e164)}`
+  return message ? `${base}?text=${encodeURIComponent(message)}` : base
 }

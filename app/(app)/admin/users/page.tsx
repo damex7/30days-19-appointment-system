@@ -79,7 +79,7 @@ async function Users({ searchParams }: Pick<PageProps<'/admin/users'>, 'searchPa
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-sans text-lg font-bold">{user.name}</h3>
                     {isSelf ? <span className="text-sm text-muted">(you)</span> : null}
-                    <span className={cn('rounded-pill px-2 py-0.5 text-xs font-bold uppercase', user.role === 'admin' ? 'bg-rose-soft text-ink' : 'bg-sunken text-muted')}>{user.role}</span>
+                    <span className={cn('rounded-pill px-2 py-0.5 text-xs font-bold uppercase', user.role === 'admin' ? 'bg-tint text-ink' : 'bg-sunken text-muted')}>{user.role}</span>
                     {deactivated ? (
                       <span className="inline-flex items-center gap-1 rounded-pill bg-danger px-2 py-0.5 text-xs font-bold text-on-danger uppercase">
                         <Icon name="close" className="size-3" /> Deactivated

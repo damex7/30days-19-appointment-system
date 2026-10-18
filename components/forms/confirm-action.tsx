@@ -106,7 +106,7 @@ export function ConfirmAction({
         }}
         className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-card border border-line bg-raised p-0 text-ink shadow-pop backdrop:backdrop-blur-[1px]"
       >
-        <div className={cn('h-1.5', danger ? 'bg-danger' : 'bg-carbon')} aria-hidden />
+        <div className={cn('h-1.5', danger ? 'bg-danger' : 'bg-brand')} aria-hidden />
         <div className="p-6">
           <h2 id={titleId} className="text-2xl">
             {title}

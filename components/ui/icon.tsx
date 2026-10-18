@@ -142,44 +142,10 @@ const ICONS = {
       <rect x="13" y="11" width="7" height="9" rx="1" />
     </>
   ),
-  /** Products: a taped carton. */
-  box: (
-    <>
-      <path d="M3.5 8 12 4l8.5 4v8.5L12 20.5 3.5 16.5Z" />
-      <path d="M3.5 8 12 12l8.5-4M12 12v8.5M7.8 6l8.4 4" />
-    </>
-  ),
-  /** Movements: a receipt with a torn bottom edge. */
-  receipt: (
-    <>
-      <path d="M6 3.5h12v17l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4Z" />
-      <path d="M9 8h6M9 11.5h6M9 15h3.5" />
-    </>
-  ),
   tag: (
     <>
       <path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1.4 1.4 0 0 1 0 2l-6.6 6.6a1.4 1.4 0 0 1-2 0Z" />
       <circle cx="8" cy="8" r="1.3" />
-    </>
-  ),
-  truck: (
-    <>
-      <path d="M2.5 6.5h11v9h-11ZM13.5 9.5h4l3 3.2v2.8h-7" />
-      <circle cx="6.5" cy="17" r="1.8" />
-      <circle cx="16.5" cy="17" r="1.8" />
-    </>
-  ),
-  /** Locations: a shop front with an awning. */
-  store: (
-    <>
-      <path d="M4 9.5V20h16V9.5M3 9.5 4.8 4h14.4L21 9.5Z" />
-      <path d="M3 9.5c0 1.4 1 2.3 2.25 2.3S7.5 10.9 7.5 9.5c0 1.4 1 2.3 2.25 2.3S12 10.9 12 9.5c0 1.4 1 2.3 2.25 2.3s2.25-.9 2.25-2.3c0 1.4 1 2.3 2.25 2.3S21 10.9 21 9.5M10 20v-5h4v5" />
-    </>
-  ),
-  report: (
-    <>
-      <path d="M5 3.5h10l4 4v13H5Z" />
-      <path d="M15 3.5v4h4M8.5 17v-3M12 17v-6M15.5 17v-4.5" />
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
@@ -203,7 +169,6 @@ const ICONS = {
     </>
   ),
   /** Transfer: two arrows passing each other. */
-  transfer: <path d="M4 8h14m-3.5-3.5L18 8l-3.5 3.5M20 16H6m3.5-3.5L6 16l3.5 3.5" />,
   download: <path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 19.5h14" />,
   upload: <path d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 19.5h14" />,
   copy: (
@@ -225,24 +190,54 @@ const ICONS = {
   sortNone: <path d="m8 9.5 4-4 4 4M8 14.5l4 4 4-4" />,
   sortAsc: <path d="m7.5 14 4.5-4.5 4.5 4.5" />,
   sortDesc: <path d="m7.5 10 4.5 4.5 4.5-4.5" />,
-  /** Out of stock: an X in a box. */
-  outOfStock: (
+  // BOOKING STATES: each has its own SHAPE, so a state reads without colour.
+  /** Open slot: a plus in a circle ("take it"). */
+  slotOpen: (
     <>
-      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 8v8M8 12h8" />
+    </>
+  ),
+  /** Booked: a filled dot inside a ring. */
+  slotBooked: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="3.5" fill="currentColor" />
+    </>
+  ),
+  /** Unavailable: a dash. */
+  slotUnavailable: <path d="M6.5 12h11" />,
+  /** Cancelled: a cross in a circle. */
+  slotCancelled: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
       <path d="m9 9 6 6m0-6-6 6" />
     </>
   ),
-  /** Low stock: a triangle pointing down, like a falling gauge. */
-  lowStock: (
+  /** No-show: an exclamation mark in a dashed circle. */
+  slotNoShow: (
     <>
-      <path d="M4 5.5h16L12 19.5Z" />
-      <path d="M12 9v4m0 2.6v.01" />
+      <circle cx="12" cy="12" r="8.5" strokeDasharray="3 2.4" />
+      <path d="M12 7.5v5.5m0 3v.01" />
     </>
   ),
-  inStock: (
+  scissors: (
     <>
-      <rect x="4" y="4" width="16" height="16" rx="2" />
-      <path d="m8.3 12.2 2.6 2.6 5-5.3" />
+      <circle cx="6.5" cy="17.5" r="2.5" />
+      <circle cx="17.5" cy="17.5" r="2.5" />
+      <path d="M8.3 15.7 17 4.5M15.7 15.7 7 4.5" />
+    </>
+  ),
+  mapPin: (
+    <>
+      <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" />
+      <circle cx="12" cy="10" r="2.3" />
+    </>
+  ),
+  history: (
+    <>
+      <path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6" />
+      <path d="M4 4v4.6h4.6M12 8v4.3l3 2" />
     </>
   ),
   calendar: (

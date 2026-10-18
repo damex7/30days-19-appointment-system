@@ -35,7 +35,7 @@ async function Password() {
           <p>Your admin gave you a temporary password. Before you start, replace it with one only you know.</p>
         </Notice>
       ) : null}
-      <section aria-label="New password" className="ruled rounded-card border border-line p-5 pl-10 shadow-card sm:p-7 sm:pl-12">
+      <section aria-label="New password" className="rounded-card border border-line bg-raised p-5 shadow-card sm:p-7">
         <ChangePasswordForm email={user.email} name={user.name} temporary={temporary} />
       </section>
     </div>

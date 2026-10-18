@@ -67,22 +67,22 @@ async function Sessions({ searchParams }: Pick<PageProps<'/account/sessions'>, '
         {sessions.map((session) => {
           const isCurrent = session.id === current.id
           return (
-            <li key={session.id} className={`rounded-card border bg-raised p-5 shadow-card ${isCurrent ? 'border-rose border-2' : 'border-line'}`}>
+            <li key={session.id} className={`rounded-card border bg-raised p-5 shadow-card ${isCurrent ? 'border-brand border-2' : 'border-line'}`}>
               <div className="flex items-start gap-3">
-                <span className="grid size-11 shrink-0 place-items-center rounded-control bg-canary text-ink">
+                <span className="grid size-11 shrink-0 place-items-center rounded-control bg-tint text-ink">
                   <Icon name={isPhone(session.userAgent) ? 'phone' : 'laptop'} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <h2 className="flex flex-wrap items-center gap-2 font-sans text-lg font-bold">
                     {describeUserAgent(session.userAgent)}
-                    {isCurrent ? <span className="rounded-pill bg-rose-soft px-2.5 py-0.5 text-sm font-bold text-ink">This device</span> : null}
+                    {isCurrent ? <span className="rounded-pill bg-tint px-2.5 py-0.5 text-sm font-bold text-ink">This device</span> : null}
                   </h2>
                   <p className="text-muted">
                     {session.location ?? 'Unknown location'}
                     {session.ip ? (
                       <>
                         {' · '}
-                        <span className="font-mono text-sm">{session.ip}</span>
+                        <span className="figures text-sm">{session.ip}</span>
                       </>
                     ) : null}
                   </p>

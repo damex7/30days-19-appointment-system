@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 import { Mark } from '@/components/brand/mark'
 
-/** The centred card every sign-in page uses: a receipt sheet with a perforated top. */
+/** The centred card every sign-in page uses, with a plaited band across the top. */
 export function AuthCard({ title, intro, children, footer }: { title: string; intro?: ReactNode; children: ReactNode; footer?: ReactNode }) {
   return (
     <div className="mx-auto w-full max-w-form px-4 py-10 sm:py-14">
       <div className="overflow-hidden rounded-card border border-line bg-raised shadow-card">
-        <div className="perforated h-1.5 bg-carbon" aria-hidden />
+        <div className="plait mt-3" aria-hidden />
         <div className="p-5 sm:p-8">
           <Mark className="mb-4 size-10" />
           <h1 className="text-3xl">{title}</h1>

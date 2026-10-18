@@ -28,7 +28,7 @@ export function ErrorPanel({ error, reset }: { error: Error & { digest?: string 
       </p>
       {/* In production Next.js hides the real message from the browser; the
           digest matches the full error in the server logs. */}
-      {error.digest ? <p className="mt-2 font-mono text-xs text-muted">Reference: {error.digest}</p> : null}
+      {error.digest ? <p className="figures mt-2 text-xs text-muted">Reference: {error.digest}</p> : null}
       <div className="mt-6 flex flex-wrap justify-center gap-2">
         <button
           type="button"

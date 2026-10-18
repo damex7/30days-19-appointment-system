@@ -32,7 +32,7 @@ export function SortHeader({
     <th scope="col" aria-sort={active ? (dir === 'asc' ? 'ascending' : 'descending') : undefined} className={cn('px-3 py-2.5 font-semibold', align === 'right' ? 'text-right' : 'whitespace-nowrap', className)}>
       <Link href={href} scroll={false} className={cn('inline-flex items-center gap-1 rounded-control no-underline hover:underline', align === 'right' && 'flex-row-reverse')}>
         {label}
-        <Icon name={active ? (dir === 'asc' ? 'sortAsc' : 'sortDesc') : 'sortNone'} className={cn('size-4', active ? 'text-rose' : 'text-muted')} />
+        <Icon name={active ? (dir === 'asc' ? 'sortAsc' : 'sortDesc') : 'sortNone'} className={cn('size-4', active ? 'text-brand' : 'text-muted')} />
         <span className="sr-only">, sort {nextDir}</span>
       </Link>
     </th>
@@ -53,14 +53,14 @@ export function Th({ children, align = 'left', className }: { children: ReactNod
  * its own if the table is wider than the screen (never the whole page).
  * `relative` keeps screen-reader-only text inside from escaping the scroll
  * box, a Day 12 lesson. Canary (the triplicate copy) heads the columns,
- * and rows are ruled like a receipt book.
+ * and rows are separated by hairlines.
  */
 export function TableFrame({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={cn(
         'relative overflow-x-auto rounded-card border border-line bg-raised shadow-card',
-        '[&_thead]:bg-canary [&_thead]:text-sm [&_tbody_tr]:border-t [&_tbody_tr]:border-rule [&_tbody_tr:hover]:bg-canary/60',
+        '[&_thead]:bg-tint [&_thead]:text-sm [&_tbody_tr]:border-t [&_tbody_tr]:border-rule [&_tbody_tr:hover]:bg-tint/60',
         className,
       )}
     >
@@ -77,7 +77,7 @@ export function TableFrame({ children, className }: { children: ReactNode; class
 export function Pagination({ page, total, pageSize, hrefFor, label = 'Pages' }: { page: number; total: number; pageSize: number; hrefFor: (page: number) => string; label?: string }) {
   const pages = Math.max(1, Math.ceil(total / pageSize))
   if (pages <= 1) return null
-  const link = 'inline-flex min-h-11 items-center gap-1 rounded-control border border-line-strong bg-raised px-3 font-semibold no-underline hover:bg-canary'
+  const link = 'inline-flex min-h-11 items-center gap-1 rounded-control border border-line-strong bg-raised px-3 font-semibold no-underline hover:bg-tint'
   const off = 'inline-flex min-h-11 items-center gap-1 rounded-control border border-line px-3 text-muted'
   return (
     <nav aria-label={label} className="flex items-center justify-between gap-2">

@@ -1,26 +1,268 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * ÌPÀDÉ DESIGN TOKENS: palette "99J".
+ *
+ * 99J is the deep plum-burgundy shade of braiding extensions that every
+ * Nigerian salon keeps by the bundle, next to 1B (off-black). The app takes
+ * the salon's materials:
+ *   - 99J PLUM: primary buttons, the selected choice, the active tab and the
+ *     brand mark. Used for things you press or have chosen, nothing else.
+ *   - BONE: a warm off-white page, like a clean salon towel.
+ *   - CHARCOAL (the 1B shade): text.
+ *   - LAVENDER: a soft tint of the plum for OPEN time slots, selected rows
+ *     and hovers: "this is available to you".
+ * Dark mode is deep aubergine with soft bone text and a lighter plum.
+ *
+ * BOOKING STATES are each their own colour AND their own icon and word, so
+ * none relies on colour alone, and none can be mistaken for the brand:
+ *   open         lavender tint, plum text, "+"           (the brand family on purpose: "pick me")
+ *   selected     solid plum, bone text, "✓"
+ *   booked       SLATE BLUE (hue ~210°), filled dot       ("taken", calm, not alarming)
+ *   unavailable  warm GREY, diagonal hatching, "–"
+ *   cancelled    BRICK RED (hue ~4°), "✕", struck-through time
+ *   completed    FOREST GREEN, "✓"
+ *   no-show      charcoal OUTLINE, dashed, "!"
+ * Slate blue sits far from plum (330°) and from the banned indigo (~240°);
+ * the red is a deep brick, never a soft rose-pink.
+ *
+ * No peach, tangerine, orange, lime, indigo, teal, rose-pink or canary
+ * yellow anywhere. `--color-*: initial` removes Tailwind's default palette,
+ * so an off-brand `bg-orange-500` doesn't even exist.
+ *
+ * Each colour is written ONCE as light-dark(light, dark). The browser picks
+ * a side from `color-scheme`, which the theme toggle sets via data-theme,
+ * so components need no `dark:` classes for colour.
+ * `npm run check:contrast` checks every pair the UI uses, in both modes.
+ */
+@theme {
+  --color-*: initial;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Surfaces: the page, raised cards, sunken wells. */
+  --color-paper: light-dark(#f6f1e9, #1a1120);
+  --color-raised: light-dark(#fffcf7, #241829);
+  --color-sunken: light-dark(#ede6dc, #120b16);
+  --color-line: light-dark(#ddd3c7, #3a2c40);
+  /* Borders that must be SEEN (inputs, buttons, slot outlines): 3:1 on every surface. */
+  --color-line-strong: light-dark(#877b74, #8f8093);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Ink: charcoal on bone, bone on aubergine. */
+  --color-ink: light-dark(#25211f, #efe6dc);
+  --color-muted: light-dark(#5d5550, #bdafb8);
+
+  /* 99J plum. */
+  --color-brand: light-dark(#5e1b3f, #dba6ca);
+  --color-brand-hover: light-dark(#45122d, #ecc4de);
+  --color-on-brand: light-dark(#fffcf7, #1a1120);
+
+  /* Lavender tint: open slots, selected rows, hovers. */
+  --color-tint: light-dark(#ede5f4, #352543);
+  --color-tint-strong: light-dark(#ddd0ec, #47335a);
+
+  /* Booked: slate blue. Also the "warning" tone of notices (calm, informative). */
+  --color-booked: light-dark(#2b5b88, #95bee6);
+  --color-booked-soft: light-dark(#e0eaf4, #172739);
+  --color-on-booked: light-dark(#ffffff, #0d1825);
+  --color-warning: light-dark(#2b5b88, #95bee6);
+  --color-warning-soft: light-dark(#e0eaf4, #172739);
+
+  /* Unavailable: warm grey (with hatching, see the `hatched` utility). */
+  --color-unavailable: light-dark(#675f5a, #a59b97);
+  --color-unavailable-soft: light-dark(#e8e1d9, #2b2230);
+
+  /* Cancelled and errors: brick red. */
+  --color-danger: light-dark(#a3271e, #f28b8b);
+  --color-danger-hover: light-dark(#821c15, #f7abab);
+  --color-on-danger: light-dark(#ffffff, #1c0809);
+  --color-danger-soft: light-dark(#f5e2de, #3b1a1e);
+
+  /* Completed and success: forest green. */
+  --color-success: light-dark(#1d6a3c, #86d3a2);
+  --color-on-success: light-dark(#ffffff, #08200f);
+  --color-success-soft: light-dark(#dcece0, #14291d);
+
+  /* Focus: a plum ring, 3:1 or more against every surface it can sit on. */
+  --color-focus: light-dark(#5e1b3f, #e3b2d4);
+
+  --color-white: #ffffff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* Typography (variables from next/font in app/layout.tsx).
+     Cormorant Garamond for headings: a high-contrast, calligraphic serif
+     with the calm polish of a good salon's signage. Work Sans for
+     everything else: open, plain and very readable on a phone, with
+     tabular figures so times and prices line up. Both were checked for
+     ₦, Ì, à, é, ọ, ẹ, ṣ, the combining marks and `tnum` (cmap parsed). */
+  --font-display: var(--font-cormorant), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-work-sans), system-ui, sans-serif;
+
+  --radius-control: 0.625rem;
+  --radius-card: 1rem;
+  --radius-pill: 999px;
+
+  /* Soft, warm shadows: a card resting on a towel, not floating. */
+  --shadow-card: 0 1px 0 rgb(37 33 31 / 0.05), 0 12px 28px -20px rgb(70 18 45 / 0.45);
+  --shadow-pop: 0 22px 48px -18px rgb(26 17 32 / 0.6);
+
+  --container-form: 34rem;
+  --container-page: 76rem;
+
+  --animate-shimmer: shimmer 1.4s linear infinite;
+  --animate-rise: rise 0.25s ease-out both;
+
+  @keyframes shimmer {
+    from {
+      background-position: 150% 0;
+    }
+    to {
+      background-position: -50% 0;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/*
+ * THEME SWITCHING. `color-scheme` decides which side of light-dark() wins.
+ * - No attribute (no saved choice, or JavaScript off): follow the OS.
+ * - data-theme="light" | "dark": set before first paint by the inline script
+ *   in app/layout.tsx, so a saved choice never flashes the other theme.
+ */
+:root {
+  color-scheme: light dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* ONE focus style for keyboard users everywhere: a solid plum ring. */
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  /* The error summary and headings take focus by script; they get the ring too. */
+  [tabindex="-1"]:focus {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-tint-strong);
+    color: var(--color-ink);
+  }
+
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+  a:hover {
+    text-decoration-color: var(--color-brand);
+  }
+
+  ::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+  }
+
+  dialog::backdrop {
+    background: rgb(18 11 22 / 0.6);
+  }
+}
+
+/* Inputs: a visible border and a thick plum edge when focused. aria-invalid
+   fields get a red border; the message under the field says what's wrong. */
+@utility field {
+  background-color: var(--color-raised);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  &[aria-invalid="true"] {
+    border-color: var(--color-danger);
+    border-width: 2px;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 0;
+    border-color: var(--color-focus);
+  }
+}
+
+/* TIMES, PRICES, DATES: tabular figures, so 10:15 and 11:45 are the same
+   width and columns of prices line up. */
+@utility figures {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* UNAVAILABLE: soft grey with diagonal hatching, so "can't book" reads
+   even in greyscale and isn't just a lighter colour. */
+@utility hatched {
+  background-color: var(--color-unavailable-soft);
+  background-image: repeating-linear-gradient(-45deg, transparent 0 6px, color-mix(in srgb, var(--color-unavailable) 22%, transparent) 6px 7px);
+}
+
+/* A braid-like divider: three interlocking strands, drawn with gradients. */
+@utility plait {
+  height: 6px;
+  background-image:
+    radial-gradient(ellipse 5px 3px at 5px 3px, var(--color-brand) 98%, transparent),
+    radial-gradient(ellipse 5px 3px at 5px 3px, var(--color-tint-strong) 98%, transparent);
+  background-size: 10px 6px;
+  background-position: 0 0, 5px 0;
+  background-repeat: repeat-x;
+}
+
+/* Skeleton shimmer for loading states. */
+@utility skeleton {
+  background-image: linear-gradient(90deg, var(--color-sunken) 0%, var(--color-line) 50%, var(--color-sunken) 100%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+  border-radius: var(--radius-control);
+}
+
+/*
+ * REDUCED MOTION: people who ask their OS for less motion get none.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -36,7 +36,7 @@ export function Flash({ message, tone = 'success' }: { message: string | null; t
         >
           <Icon name={tone === 'success' ? 'checkCircle' : 'info'} className={cn('mt-0.5', tone === 'success' ? 'text-success' : 'text-ink')} />
           <p className="flex-1 font-semibold">{shown}</p>
-          <button type="button" onClick={() => setDismissed(true)} className="-m-1.5 grid size-9 place-items-center rounded-control text-muted hover:bg-canary hover:text-ink">
+          <button type="button" onClick={() => setDismissed(true)} className="-m-1.5 grid size-9 place-items-center rounded-control text-muted hover:bg-tint hover:text-ink">
             <Icon name="close" className="size-4" label="Dismiss message" />
           </button>
         </div>

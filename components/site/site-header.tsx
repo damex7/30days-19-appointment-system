@@ -3,7 +3,7 @@ import { Suspense } from 'react'
 import { Logo } from '@/components/brand/logo'
 import { button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import { getCurrentSession } from '@/lib/auth/dal'
+import { getCurrentSession, homePathFor } from '@/lib/auth/dal'
 import { rethrowNextErrors } from '@/lib/next-errors'
 import { SignOutButton } from './sign-out-button'
 import { ThemeToggle } from './theme-toggle'
@@ -44,24 +44,35 @@ async function AccountControls() {
 
   if (!current) {
     return (
-      <Link href="/login" className={`${button.secondary} px-3 whitespace-nowrap`}>
-        Sign in
-      </Link>
+      <>
+        <Link href="/login" className={`${button.ghost} px-3 whitespace-nowrap`}>
+          Sign in
+        </Link>
+        <Link href="/book" className={`${button.primary} px-3 whitespace-nowrap`}>
+          Book<span className="max-sm:sr-only"> now</span>
+        </Link>
+      </>
     )
   }
 
+  const { role, name } = current.user
   return (
     <>
-      {/* The most common job, one tap away from every page. */}
-      <Link href="/movements/new" className={`${button.primary} px-3`}>
-        <Icon name="plus" />
-        <span>
-          Record<span className="max-sm:sr-only"> stock</span>
-        </span>
-      </Link>
-      <Link href="/account" className={`${button.ghost} max-w-44 px-2.5`} aria-label={`Your account (${current.user.name})`}>
+      {/* Each role's most common job, one tap away from every page. */}
+      {role === 'client' ? (
+        <Link href="/book" className={`${button.primary} px-3 whitespace-nowrap`}>
+          <Icon name="plus" />
+          Book<span className="max-sm:sr-only"> now</span>
+        </Link>
+      ) : (
+        <Link href={homePathFor(role)} className={`${button.primary} px-3 whitespace-nowrap`}>
+          <Icon name="calendar" />
+          {role === 'admin' ? 'Studio' : 'My day'}
+        </Link>
+      )}
+      <Link href="/account" className={`${button.ghost} max-w-44 px-2.5`} aria-label={`Your account (${name})`}>
         <Icon name="user" />
-        <span className="truncate max-md:hidden">{current.user.name}</span>
+        <span className="truncate max-md:hidden">{name}</span>
       </Link>
       {/* On a phone, Sign out lives on the account page to keep the header on one line. */}
       <div className="max-sm:hidden">
