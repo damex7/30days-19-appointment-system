@@ -1,5 +1,5 @@
-// PROXY: runs before every page request. It does two quick jobs and
-// deliberately NOT a third.
+// PROXY: runs before every page request. It does three quick jobs, and
+// deliberately not a fourth.
 //
 // 1. OPTIMISTIC REDIRECT: a request for a protected page with NO session
 //    cookie at all goes straight to /login?next=…, before any rendering.
@@ -12,12 +12,19 @@
 //    page load the proxy re-sends the same cookie with a fresh 30-day
 //    Max-Age. The database still decides when the session really ends.
 //
-// What it does NOT do: look the session up in the database, or redirect
-// signed-in people away from /login. With a stale cookie, "/login → you're
-// signed in, go to /appointments" and "/appointments → not signed in, go to
+// 3. AN HONEST 404 for /appointments/<id> when that booking isn't yours
+//    (one indexed query, only on those URLs; see below).
+//
+// What it does NOT do: protect anything on its own, or redirect signed-in
+// people away from /login. The pages, actions and route handlers check
+// the session, the role and ownership themselves (lib/auth/dal.ts and
+// lib/booking/access.ts). And with a stale cookie, "/login → you're signed
+// in, go to /appointments" and "/appointments → not signed in, go to
 // /login" would bounce forever. The login page checks the session itself.
 import { NextResponse, type NextRequest } from 'next/server'
 import { SESSION_COOKIE, sessionCookieOptions } from '@/lib/auth/cookie'
+import { hashToken } from '@/lib/auth/tokens'
+import { bookingVisibility } from '@/lib/booking/access'
 
 // The signed-in areas. The home page and /book stay public, so anyone can
 // browse services and open times; the booking step itself asks for a
@@ -28,9 +35,30 @@ function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
 }
 
-export function proxy(request: NextRequest) {
+// /appointments/42, /appointments/42/reschedule, /appointments/42/calendar.ics
+const BOOKING_PATH = /^\/appointments\/(\d{1,9})(?:\/|$)/
+
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
   const token = request.cookies.get(SESSION_COOKIE)?.value
+
+  // 3. A TRUE 404 FOR SOMEONE ELSE'S BOOKING. The page itself only ever
+  //    loads a booking through its SQL ownership scope, so it would show
+  //    "not found" anyway, but by then a streamed page has already sent
+  //    "200 OK". This one indexed lookup runs before rendering, so the
+  //    status is honest: 404 whether the booking doesn't exist or simply
+  //    isn't yours. (No session? Let the page send them to sign in.)
+  // A booking id that isn't even a number can't exist: 404 without asking.
+  if (/^\/appointments\/[^/]+/.test(pathname) && !BOOKING_PATH.test(pathname)) {
+    return NextResponse.rewrite(new URL('/booking-not-found', request.url), { status: 404 })
+  }
+  const bookingMatch = token ? BOOKING_PATH.exec(pathname) : null
+  if (token && bookingMatch?.[1] && /^[A-Za-z0-9_-]{43}$/.test(token)) {
+    const visibility = await bookingVisibility(hashToken(token), Number(bookingMatch[1]))
+    if (visibility === 'hidden') {
+      return NextResponse.rewrite(new URL('/booking-not-found', request.url), { status: 404 })
+    }
+  }
 
   if (isProtected(pathname) && !token) {
     const login = new URL('/login', request.url)

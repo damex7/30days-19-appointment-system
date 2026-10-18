@@ -7,8 +7,8 @@ import { cn } from '@/lib/cn'
 import { Icon } from './icon'
 
 /**
- * A short confirmation after a redirect ("Product added", "Sale recorded:
- * 9 left at Shop floor"), passed in the URL as ?notice=… and turned into
+ * A short confirmation after a redirect ("You’re booked", "Service
+ * saved"), passed in the URL as ?notice=… and turned into
  * words by the page.
  *
  * Why the effect: a live region only announces CHANGES. Text that is

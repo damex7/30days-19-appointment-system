@@ -11,7 +11,7 @@ import { SubmitButton } from './submit-button'
 type Action = (state: FormState, formData: FormData) => Promise<FormState>
 
 /**
- * A button that asks first: Delete, Archive, Deactivate.
+ * A button that asks first: Cancel a booking, Delete, Archive, Deactivate.
  *
  * It uses a native <dialog> opened with showModal(), which:
  * - TRAPS FOCUS inside the dialog and makes the page behind it inert,
@@ -22,7 +22,7 @@ type Action = (state: FormState, formData: FormData) => Promise<FormState>
  * closes (done explicitly below, rather than trusting every browser).
  *
  * The Server Action's answer appears INSIDE the dialog (role="alert") when
- * it refuses, e.g. "this product has 37 movements, so it can't be
+ * it refuses, e.g. "this service has bookings, so it can't be
  * deleted", together with an "Archive instead" button when the action
  * offers one. A success closes the dialog and is announced beside the button.
  */
@@ -38,6 +38,7 @@ export function ConfirmAction({
   pendingLabel = 'Working…',
   danger = false,
   archiveAction,
+  formExtra,
 }: {
   action: Action
   fields: Record<string, string>
@@ -51,6 +52,8 @@ export function ConfirmAction({
   danger?: boolean
   /** Offered when the main action refuses with offerArchive (a delete blocked by history). */
   archiveAction?: Action
+  /** Extra fields inside the confirming form, e.g. an optional cancellation reason. */
+  formExtra?: ReactNode
 }) {
   const [state, formAction] = useActionState(action, { status: 'idle' } satisfies FormState)
   const [archiveState, archiveFormAction] = useActionState(archiveAction ?? (async () => ({ status: 'idle' }) satisfies FormState), { status: 'idle' } satisfies FormState)
@@ -139,10 +142,11 @@ export function ConfirmAction({
             </div>
           ) : null}
 
-          <form action={formAction} className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <form action={formAction} className="mt-6 flex flex-col-reverse flex-wrap gap-2 sm:flex-row sm:justify-end">
             {Object.entries(fields).map(([name, value]) => (
               <input key={name} type="hidden" name={name} value={value} />
             ))}
+            {formExtra ? <div className="order-last w-full sm:order-first">{formExtra}</div> : null}
             {/* autoFocus: the SAFE choice gets focus when the dialog opens. */}
             <button type="button" autoFocus className={button.secondary} onClick={close}>
               Cancel
