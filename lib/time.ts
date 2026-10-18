@@ -316,3 +316,13 @@ export function fromNow(instant: Date, now: Date = new Date()): string {
   }
   return 'just now'
 }
+
+/**
+ * "Now", for request-time Server Components (which has this appointment
+ * started? what's next?). Those render once per request, so reading the
+ * clock is fine; going through one named function makes that a visible
+ * choice rather than a stray Date.now() in a component.
+ */
+export function currentTime(): Date {
+  return new Date()
+}

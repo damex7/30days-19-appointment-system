@@ -24,7 +24,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { SESSION_COOKIE, sessionCookieOptions } from '@/lib/auth/cookie'
 import { hashToken } from '@/lib/auth/tokens'
-import { bookingVisibility } from '@/lib/booking/access'
+import { bookingVisibility } from '@/lib/booking/visibility'
 
 // The signed-in areas. The home page and /book stay public, so anyone can
 // browse services and open times; the booking step itself asks for a

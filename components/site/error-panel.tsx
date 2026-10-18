@@ -1,6 +1,8 @@
 // The body of the error boundaries (app/error.tsx and friends). A Client
 // Component: it renders after the server gave up, and its "Try again"
-// button runs in the browser.
+// button runs in the browser. In production the browser never sees the
+// real error (only a digest that matches the server log), so the message
+// covers the likely case, a database that didn't answer, without guessing.
 'use client'
 
 import Link from 'next/link'
@@ -21,10 +23,10 @@ export function ErrorPanel({ error, reset }: { error: Error & { digest?: string 
       <span className="mb-4 grid size-14 place-items-center rounded-full border-2 border-dashed border-danger text-danger">
         <Icon name="cloudOff" className="size-6" />
       </span>
-      <h1 className="text-3xl">We couldn’t reach the stock records</h1>
+      <h1 className="text-3xl">We couldn’t load this just now</h1>
       <p className="mt-3 text-muted">
-        The database didn’t answer. It may be waking up after a quiet spell (that takes a few seconds), or the internet connection is down. Nothing
-        was saved or changed, so it’s safe to try again.
+        Most often the appointment book (our database) is waking up after a quiet spell, which takes a few seconds, or the connection dropped. Nothing
+        was booked or changed, so it’s safe to try again.
       </p>
       {/* In production Next.js hides the real message from the browser; the
           digest matches the full error in the server logs. */}
@@ -43,8 +45,8 @@ export function ErrorPanel({ error, reset }: { error: Error & { digest?: string 
         >
           Try again
         </button>
-        <Link href="/dashboard" className={button.secondary}>
-          Back to the dashboard
+        <Link href="/start" className={button.secondary}>
+          Go to my page
         </Link>
       </div>
     </div>

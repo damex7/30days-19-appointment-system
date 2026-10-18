@@ -20,6 +20,8 @@
 // every query is built with can't be forgotten in one place.
 import 'server-only'
 
+import { notFound } from 'next/navigation'
+import { requireRole } from '@/lib/auth/dal'
 import { sql } from '@/lib/db'
 import type { SessionWithUser } from '@/lib/auth/dal'
 import { getStylistForUser } from '@/lib/studio/stylists'
@@ -45,34 +47,16 @@ export function bookingScope(viewer: Viewer) {
 }
 
 /**
- * The same ownership rule, asked from proxy.ts with only the session
- * cookie in hand: "may whoever holds this session token see booking N?"
- *
- * Why the proxy asks at all: pages under Cache Components start streaming
- * a 200 before the page's own check runs, and a status can't be changed
- * once streaming has begun. The proxy runs BEFORE rendering, so it can
- * answer with a true 404. The page still runs getBooking() with
- * bookingScope(), which is what actually keeps the data private; this is
- * only there so the HTTP status tells the truth.
- *
- * One indexed query: the session by its primary key, the booking by its
- * primary key. 'no_session' (expired, revoked, made up) is told apart from
- * 'hidden', so the page can still send that person to sign in.
+ * For stylist pages and actions: the session (role 'stylist'), the
+ * stylist's own row, and their viewer. The stylist id used in every query
+ * comes from HERE, from the session, never from the URL or a form.
  */
-export async function bookingVisibility(tokenHash: string, bookingId: number): Promise<'visible' | 'hidden' | 'no_session'> {
-  const rows = await sql`
-    SELECT EXISTS (
-             SELECT 1 FROM bookings b
-             WHERE b.id = ${bookingId}
-               AND (u.role = 'admin'
-                    OR (u.role = 'client' AND b.client_id = u.id)
-                    OR (u.role = 'stylist' AND b.stylist_id = st.id))
-           ) AS visible
-    FROM sessions s
-    JOIN users u ON u.id = s.user_id AND u.deactivated_at IS NULL
-    LEFT JOIN stylists st ON st.user_id = u.id
-    WHERE s.id = ${tokenHash} AND s.expires_at > now()`
-  const row = rows[0]
-  if (!row) return 'no_session'
-  return row.visible === true ? 'visible' : 'hidden'
+export async function requireStylist() {
+  const current = await requireRole('stylist')
+  const stylist = await getStylistForUser(current.user.id)
+  // A stylist account without a stylists row shouldn't exist (they're
+  // created together); treat it as "nothing here".
+  if (!stylist) notFound()
+  const viewer: Viewer = { userId: current.user.id, role: 'stylist', stylistId: stylist.id }
+  return { current, stylist, viewer }
 }

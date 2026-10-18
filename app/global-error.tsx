@@ -9,7 +9,7 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
       <body style={{ margin: 0, minHeight: '100dvh', display: 'grid', placeItems: 'center', background: '#f6f3ea', color: '#18181b', fontFamily: 'system-ui, sans-serif' }}>
         <main style={{ maxWidth: '28rem', padding: '2rem', textAlign: 'center' }}>
           <h1 style={{ fontSize: '1.75rem' }}>Ìpamọ́ hit a problem</h1>
-          <p>Something went wrong while loading the app. No stock records were changed.</p>
+          <p>Something went wrong while loading the app. No bookings were changed.</p>
           <button
             type="button"
             onClick={reset}

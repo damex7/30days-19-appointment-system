@@ -40,7 +40,7 @@ const WORDS = (
  * first sign-in.
  */
 export function generateTemporaryPassword(): string {
-  const words = Array.from({ length: 3 }, () => WORDS[randomInt(WORDS.length)] ?? 'stock')
+  const words = Array.from({ length: 3 }, () => WORDS[randomInt(WORDS.length)] ?? 'braid')
   const digits = String(randomInt(10_000)).padStart(4, '0')
   return [...words, digits].join('-')
 }
